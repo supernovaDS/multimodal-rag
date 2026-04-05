@@ -6,7 +6,7 @@ python-multipart
 pydantic
 httpx
 
-# AI Orchestration (2026 Unified Google GenAI)
+# AI Orchestration 
 llama-index-core
 llama-index-llms-google-genai
 llama-index-embeddings-google-genai
@@ -16,4 +16,7 @@ google-genai
 # Infrastructure & Tools
 qdrant-client
 supabase
-pymupdf
+# Explicitly added for multimodal image support
+Pillow>=10.3.0 
+# Pinned for stability on Render/Linux
+pymupdf>=1.24.0
