@@ -30,7 +30,6 @@ async def upload_document(file: UploadFile = File(...)):
         shutil.copyfileobj(file.file, buffer)
     
     try:
-        # 🔥 FIX HERE
         await run_in_threadpool(ingest_pdf, temp_path)
         return {"message": f"Successfully indexed {file.filename}"}
     except Exception as e:
@@ -52,7 +51,6 @@ async def chat(
             shutil.copyfileobj(file.file, buffer)
 
     try:
-        # 🔥 FIX HERE
         answer = await run_in_threadpool(ask_engine, prompt, user_image_path)
         return {"answer": str(answer)}
 

@@ -5,9 +5,8 @@ from google import genai
 from google.genai import types
 from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.llms.google_genai import GoogleGenAI 
-from llama_index.core.schema import ImageDocument
-# Helper to fetch images from URLs
-from llama_index.core.multi_modal_llms.generic_utils import load_image_urls
+from llama_index.core.schema import ImageDocument #Wrapper for passing images to LLM
+from llama_index.core.multi_modal_llms.generic_utils import load_image_urls #Utility to download images from URLs and convert to usable format
 
 load_dotenv()
 
@@ -31,7 +30,7 @@ def get_raw_image_embedding(image_path):
         image_data = f.read()
     result = google_client.models.embed_content(
         model="gemini-embedding-2-preview",
-        contents=[types.Part.from_bytes(data=image_data, mime_type="image/png")],
+        contents=[types.Part.from_bytes(data=image_data, mime_type="image/png")], #Converts image bytes into API-compatible format
         config=types.EmbedContentConfig(output_dimensionality=3072)
     )
     return result.embeddings[0].values
@@ -42,7 +41,7 @@ def ask_engine(query_text, user_image_path=None):
         query_vector = get_raw_image_embedding(user_image_path)
     else:
         query_vector = embed_model.get_text_embedding(query_text)
-    
+    #Finds top 2 most similar pages in Qdrant based on cosine similarity of embeddings
     response = qdrant.query_points(
         collection_name=COLLECTION_NAME,
         query=query_vector,
@@ -53,7 +52,6 @@ def ask_engine(query_text, user_image_path=None):
     context_text = ""
     
     for res in response.points:
-        # RESTORED: Add the actual text content back to context
         page_text = res.payload.get('text', '')
         source_info = f"--- Source: {res.payload['source']} (Page {res.payload['page_number']}) ---\n"
         context_text += f"{source_info}{page_text}\n\n"
@@ -85,7 +83,6 @@ def ask_engine(query_text, user_image_path=None):
 
 if __name__ == "__main__":
     query = input("Ask your PDF a question: ")
-    # Optional: logic to handle local image testing via CLI
     ANS = ask_engine(query)
     
     print(f"\n Answer: \n{ANS}")
